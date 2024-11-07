@@ -1,4 +1,69 @@
-# domain_controller_migration
+# Domain Controller Migration
+
+# Description
+This project details the process of upgrading an Active Directory (AD) environment by migrating from Windows Server 2019 Domain Controllers (DCs) to Windows Server 2022. The goal was to replicate and transfer all critical AD data, FSMO roles, and services, ensuring minimal disruption and maintaining a robust, redundant environment throughout the transition. Key steps included replication, demotion of legacy DCs, and verification of successful role and service transfers.
+
+# Migration Map
+![Domain Controller Migration](https://github.com/user-attachments/assets/19f985b0-d2a2-4288-b2eb-227684f54002)
+
+
+## Tools and Utilities
+
+- **VirtualBox**: Used to virtualize the server environment for testing and migration.
+- **Windows Server 2019 & 2022**: Platforms for legacy and new Domain Controllers.
+- **Active Directory Domain Services (AD DS)**: Core service for directory management.
+- **DNS Management Console**: Managed DNS zones during the migration process.
+- **PowerShell & Command Line Tools**: Utilized for automating tasks and running validation commands (e.g., `netdom`, `ipconfig`).
+- **Event Viewer**: Checked for warnings/errors during DC promotion and demotion.
+- **Group Policy Management Console (GPMC)**: Verified and maintained Group Policy Object (GPO) consistency across servers.
+
+## Environments
+
+### Domain Controllers
+
+**Initial Setup:**
+- **A19**: Windows Server 2019 – IP `172.16.1.100` (demoted and decommissioned)
+- **B19**: Windows Server 2019 – Demoted as part of migration
+
+**Upgraded Setup:**
+- **A22**: Windows Server 2022 – IP `172.16.1.201` (post-migration FSMO holder)
+- **B22**: Windows Server 2022 – IP `172.16.1.200` (newly provisioned DC)
+
+## Network Configuration
+
+- **Internal Network**: Set up on VirtualBox with IP range `172.16.1.0/24`.
+- **DNS**: Preferred DNS configurations were adjusted between servers to ensure smooth transitions.
+
+## Program Walkthrough
+
+### Preparation and Initial Configuration
+- Installed Windows Server 2019 on VM **A19** and configured it as the forest root domain controller.
+- Set static IP addresses and verified connectivity between servers.
+
+### Replication and Adding Additional DCs
+- Installed and promoted **B19** as an additional DC, ensuring replication with **A19**.
+- Confirmed replication of OUs, users, groups, and GPOs between **A19** and **B19**.
+
+### Transition to Windows Server 2022
+- Set up Windows Server **A22** and **B22** following similar installation and promotion processes.
+- Verified replication from **A19** to **A22** and **B22**, and checked AD synchronization across all servers.
+
+### FSMO Role Transfer
+- Transferred FSMO roles from **A19** to **B22** to prepare for demotion.
+- Verified successful FSMO role transfer using `netdom query fsmo`.
+
+### Demotion of Legacy DCs
+- Demoted and decommissioned **A19** and **B19** after confirming environment stability on **A22** and **B22**.
+- Ensured DNS adjustments on all connected machines to point to the new preferred servers.
+
+### Verification and Final Steps
+- Confirmed AD health using `dcdiag`, Event Viewer logs, and connectivity tests.
+- Raised the domain and forest functional levels to align with Windows Server 2022 standards.
+
+## Documentation and Best Practices
+- Included steps for monitoring and verifying replication, ensuring no errors before demotion.
+- Emphasized the importance of backup and rollback plans in case of migration issues.
+
 
 # Installing Windows Server 2019 (A19)
 
